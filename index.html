@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>asymetra — Fotografie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+
+/* ─────────────────────────────────────────
+   RESET & BASE
+───────────────────────────────────────── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --bg:      #0b0b0b;
+  --surface: #141414;
+  --line:    rgba(255,255,255,0.08);
+  --text:    #eeeae3;
+  --dim:     rgba(238,234,227,0.40);
+  --dim2:    rgba(238,234,227,0.22);
+  --sans:    'Inter', sans-serif;
+  --serif:   'Playfair Display', serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  overflow-x: hidden;
+  cursor: none;
+}
+
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 9000;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,.18) 100%);
+}
+
+/* ─────────────────────────────────────────
+   CURSOR
+───────────────────────────────────────── */
+#c  {
+  position:fixed; width:5px; height:5px; background:var(--text); border-radius:50%;
+  pointer-events:none; z-index:9999; transform:translate(-50%,-50%);
+  mix-blend-mode:difference;
+  transition: width .2s, height .2s, background .2s;
+}
+#cr {
+  position:fixed; width:28px; height:28px;
+  border:1px solid rgba(238,234,227,.2); border-radius:50%;
+  pointer-events:none; z-index:9998; transform:translate(-50%,-50%);
+  transition: width .3s cubic-bezier(.25,.46,.45,.94),
+              height .3s cubic-bezier(.25,.46,.45,.94),
+              border-color .3s;
+}
+.hover-state #cr { width:48px; height:48px; border-color:rgba(238,234,227,.35); }
+.hover-state #c  { width:7px; height:7px; }
+
+@media (max-width:900px) {
+  #c, #cr { display:none; }
+  body { cursor: auto; }
+  a, button { cursor: pointer; }
+}
+
+/* ─────────────────────────────────────────
+   TOP NAV
+───────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 600;
+  height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px;
+  background: rgba(11,11,11,.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--line);
+}
+
+.nav-back {
+  font-family: var(--sans); font-size: 10px; font-weight: 400;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--dim); text-decoration: none;
+  display: flex; align-items: center; gap: 12px;
+  transition: color .2s;
+  cursor: none;
+}
+.nav-back-line {
+  display: block; width: 24px; height: 1px;
+  background: currentColor;
+  transition: width .25s ease;
+  flex-shrink: 0;
+}
+.nav-back:hover { color: var(--text); }
+.nav-back:hover .nav-back-line { width: 36px; }
+
+.nav-logo {
+  font-family: var(--serif); font-size: 14px; font-weight: 400;
+  font-style: italic; letter-spacing: .04em;
+  color: var(--text); text-decoration: none;
+  position: absolute; left: 50%; transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.nav-right { display:flex; align-items:center; gap:6px; }
+
+.nav-link {
+  font-family: var(--sans); font-size: 10px; font-weight: 400;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--dim);
+  text-decoration: none; padding: 6px 0;
+  border: none; background: none;
+  transition: color .18s;
+  cursor: none;
+}
+.nav-link:hover { color: var(--text); }
+
+/* ─────────────────────────────────────────
+   PAGE HEADER
+───────────────────────────────────────── */
+.page-head {
+  margin-top: 56px;
+  padding: 72px 28px 52px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: end;
+  gap: 40px;
+  border-bottom: 1px solid var(--line);
+}
+
+.ph-eyebrow {
+  font-size: 9px; letter-spacing: .28em; text-transform: uppercase;
+  color: var(--dim2); margin-bottom: 18px;
+}
+.ph-title {
+  font-family: var(--serif); font-size: clamp(2.6rem, 5.5vw, 4.2rem);
+  font-weight: 400; font-style: italic; line-height: 1.0;
+  color: var(--text); letter-spacing: -.01em;
+}
+
+.ph-book-btn {
+  display: inline-flex; align-items: center; gap: 14px;
+  margin-top: 28px;
+  font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--dim); text-decoration: none;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  width: 100%;
+  transition: color .22s;
+}
+.ph-book-btn:hover { color: var(--text); }
+.ph-book-btn-line {
+  display: block; width: 20px; height: 1px;
+  background: currentColor; flex-shrink: 0;
+  transition: width .25s ease;
+}
+.ph-book-btn:hover .ph-book-btn-line { width: 32px; }
+.ph-book-btn-arrow { margin-left: auto; transition: transform .22s; }
+.ph-book-btn:hover .ph-book-btn-arrow { transform: translateX(4px); }
+
+.ph-right { padding-bottom: 4px; }
+.ph-bio {
+  font-size: 11px; color: var(--dim); letter-spacing: .03em;
+  line-height: 1.9; font-weight: 300;
+  max-width: 360px; margin-left: auto;
+}
+.ph-bio-meta {
+  margin-top: 20px;
+  font-size: 9px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--dim2); line-height: 2;
+}
+
+/* ─────────────────────────────────────────
+   ABOUT STRIP
+───────────────────────────────────────── */
+.about-strip {
+  border-bottom: 1px solid var(--line);
+  padding: 0 28px;
+  display: flex; align-items: stretch; gap: 0;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.about-strip::-webkit-scrollbar { display:none; }
+.about-strip-item {
+  padding: 14px 28px 14px 0;
+  margin-right: 28px;
+  border-right: 1px solid var(--line);
+  font-size: 9px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--dim2); white-space: nowrap; line-height: 1;
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+.about-strip-item:last-child { border-right: none; }
+.about-strip-item strong { font-weight: 400; color: var(--dim); letter-spacing: .15em; }
+
+/* ─────────────────────────────────────────
+   FILTER STRIP
+───────────────────────────────────────── */
+.filter-strip {
+  position: sticky; top: 56px; z-index: 500;
+  background: rgba(11,11,11,.92); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--line);
+  padding: 0 28px;
+  display: flex; align-items: center; gap: 0;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.filter-strip::-webkit-scrollbar { display: none; }
+
+.fp {
+  font-size: 10px; font-weight: 400; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--dim); padding: 17px 18px;
+  background: none; border: none; border-bottom: 1px solid transparent;
+  cursor: none; white-space: nowrap;
+  transition: color .18s, border-color .18s;
+  flex-shrink: 0;
+}
+.fp:hover { color: var(--text); }
+.fp.on { color: var(--text); border-bottom-color: var(--text); }
+
+.fs-count {
+  margin-left: auto; padding-left: 24px;
+  font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim2);
+  white-space: nowrap; flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────
+   TAB PANELS
+───────────────────────────────────────── */
+.tab { display:none; animation: none; }
+.tab.on { display:block; animation: tabIn .42s cubic-bezier(.25,.46,.45,.94) both; }
+@keyframes tabIn {
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:none; }
+}
+
+/* ─────────────────────────────────────────
+   SECTION DIVIDER
+───────────────────────────────────────── */
+.sec-div {
+  padding: 52px 28px 22px;
+  display: flex; align-items: baseline; gap: 20px;
+  border-bottom: 1px solid var(--line);
+}
+.sec-div-label {
+  font-family: var(--serif); font-size: 1rem;
+  font-style: italic; font-weight: 300;
+  letter-spacing: .01em; color: var(--text);
+}
+.sec-div-line { flex:1; height:1px; background:var(--line); }
+.sec-div-count { font-size: 9px; letter-spacing:.2em; text-transform:uppercase; color:var(--dim2); }
+
+/* ─────────────────────────────────────────
+   HERO CARD
+───────────────────────────────────────── */
+.hero-card {
+  position: relative; cursor: none; overflow: hidden;
+  height: min(52vw, 520px);
+  border-bottom: 1px solid var(--line);
+}
+.hero-card img {
+  position:absolute; top:-5%; left:0;
+  width:100%; height:110%; object-fit:cover; display:block;
+  filter: brightness(.75) contrast(1.05) saturate(.85);
+  transition: transform .8s cubic-bezier(.25,.46,.45,.94), filter .4s;
+  will-change: transform;
+}
+.hero-card:hover img { filter: brightness(.8) contrast(1.06) saturate(.9); }
+.hero-card-overlay {
+  position:absolute; inset:0;
+  background: linear-gradient(to top, rgba(11,11,11,.75) 0%, rgba(11,11,11,.1) 45%, transparent 70%);
+  display:flex; flex-direction:column; justify-content:flex-end;
+  padding: 32px 36px;
+}
+.hc-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--dim);
+  margin-bottom:10px;
+}
+.hc-badge::before { content:''; width:20px; height:1px; background:currentColor; }
+.hc-title {
+  font-family:var(--serif); font-size:clamp(1.6rem,3.2vw,2.6rem);
+  font-style:italic; font-weight:300; line-height:1.1;
+  color:var(--text); margin-bottom:6px;
+}
+.hc-meta { font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim2); }
+
+/* ─────────────────────────────────────────
+   CARD GRID
+───────────────────────────────────────── */
+.grid {
+  display: grid; gap: 1px; background: var(--line);
+  grid-template-columns: repeat(3,1fr);
+}
+.grid.cols-2 { grid-template-columns: repeat(2,1fr); }
+.grid.cols-4 { grid-template-columns: repeat(4,1fr); }
+
+/* ─────────────────────────────────────────
+   CARD
+───────────────────────────────────────── */
+.card {
+  position: relative; overflow: hidden;
+  background: var(--bg); cursor: none;
+  display: flex; flex-direction: column;
+}
+.card-img {
+  position: relative; overflow: hidden;
+  aspect-ratio: 3/2;
+}
+.card.portrait .card-img { aspect-ratio: 2/3; }
+.card.wide .card-img    { aspect-ratio: 16/9; }
+/* Portrait cards in grid reset to landscape to avoid row-height conflicts */
+.grid .card.portrait .card-img { aspect-ratio: 3/2; }
+
+.card-img img {
+  width:100%; height:100%; object-fit:cover; display:block;
+  filter: brightness(.9) contrast(1.03) saturate(.88);
+  transition: transform .6s cubic-bezier(.25,.46,.45,.94), filter .35s;
+}
+.card:hover .card-img img {
+  transform: scale(1.05);
+  filter: brightness(.96) contrast(1.05) saturate(.95);
+}
+.card-img::after {
+  content:''; position:absolute; inset:0;
+  background: rgba(11,11,11,.28);
+  opacity:0; transition:opacity .3s;
+}
+.card:hover .card-img::after { opacity:1; }
+
+.card-expand {
+  position:absolute; top:12px; right:12px;
+  width:28px; height:28px; border-radius:50%;
+  background:rgba(11,11,11,.6); backdrop-filter:blur(6px);
+  border:1px solid rgba(238,234,227,.2);
+  color:var(--text); font-size:13px;
+  display:grid; place-items:center;
+  opacity:0; transform:scale(.85);
+  transition:opacity .25s, transform .25s;
+  cursor:none;
+}
+.card:hover .card-expand { opacity:1; transform:scale(1); }
+
+/* On touch devices always show expand btn */
+@media (hover: none) {
+  .card-expand { opacity: .7; transform: scale(1); }
+}
+
+.card-meta {
+  padding: 8px 12px 10px;
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+}
+.card-cat {
+  font-size: 8px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--dim2); opacity: .6;
+}
+
+/* ─────────────────────────────────────────
+   HORIZONTAL SCROLL STRIP
+───────────────────────────────────────── */
+.hscroll-wrap {
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; padding: 1px 0;
+  background: var(--line);
+}
+.hscroll-wrap::-webkit-scrollbar { display:none; }
+.hscroll { display: flex; gap: 1px; width: max-content; }
+.hscroll .card { width: clamp(200px, 22vw, 280px); flex-shrink:0; }
+.hscroll .card .card-img { aspect-ratio: 2/3; }
+
+/* ─────────────────────────────────────────
+   MORE COMING SOON STRIP
+───────────────────────────────────────── */
+.more-soon {
+  padding: 32px 28px;
+  display: flex; align-items: center; gap: 20px;
+  border-top: 1px solid var(--line);
+  opacity: .5;
+}
+.more-soon-line { flex:1; height:1px; background:var(--line); }
+.more-soon-text {
+  font-size: 9px; letter-spacing: .24em; text-transform: uppercase;
+  color: var(--dim2); white-space: nowrap;
+}
+
+/* ─────────────────────────────────────────
+   LIGHTBOX
+───────────────────────────────────────── */
+#lb {
+  position:fixed; inset:0; z-index:8000;
+  background:rgba(6,6,6,.95); backdrop-filter:blur(28px);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px;
+  opacity:0; pointer-events:none;
+  transition:opacity .3s ease;
+}
+#lb.open { opacity:1; pointer-events:all; }
+
+#lb-img {
+  max-width:86vw; max-height:80vh; object-fit:contain;
+  border-radius:2px; transition:opacity .24s;
+}
+
+#lb-bar { display:flex; align-items:center; gap:8px; }
+
+.lb-btn {
+  font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  padding:9px 20px; border-radius:99px;
+  border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.05);
+  color:var(--dim); cursor:none; transition:color .18s, border-color .18s, background .18s;
+}
+.lb-btn:hover { color:var(--text); border-color:rgba(255,255,255,.2); background:rgba(255,255,255,.09); }
+
+#lb-count {
+  font-family:var(--serif); font-size:1rem; font-style:italic;
+  color:var(--dim2); min-width:64px; text-align:center;
+}
+
+/* ─────────────────────────────────────────
+   BOOKING STRIP
+───────────────────────────────────────── */
+.booking-strip {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 40px 28px;
+  background: var(--surface);
+}
+.booking-strip-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 32px; flex-wrap: wrap;
+}
+.booking-strip-text {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.booking-strip-eyebrow {
+  font-size: 9px; letter-spacing: .24em; text-transform: uppercase;
+  color: var(--dim2);
+}
+.booking-strip-title {
+  font-family: var(--serif); font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+  font-style: italic; font-weight: 300; color: var(--text);
+}
+.booking-strip-btn {
+  display: inline-flex; align-items: center; gap: 12px;
+  padding: 14px 28px;
+  border: 1px solid rgba(238,234,227,.18);
+  background: transparent;
+  font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--dim); text-decoration: none;
+  transition: color .2s, border-color .2s, background .2s;
+  white-space: nowrap; cursor: none;
+}
+.booking-strip-btn:hover {
+  color: var(--text);
+  border-color: rgba(238,234,227,.35);
+  background: rgba(255,255,255,.04);
+}
+
+/* ─────────────────────────────────────────
+   FOOTER
+───────────────────────────────────────── */
+footer {
+  margin-top:1px;
+  border-top: 1px solid var(--line);
+  padding: 28px 28px;
+  display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+}
+.ft-logo { font-family:var(--serif); font-size:13px; font-style:italic; color:var(--dim2); letter-spacing:.04em; }
+.ft-copy { font-size:9px; letter-spacing:.12em; text-transform: uppercase; color:var(--dim2); opacity:.5; }
+.ft-links { display:flex; gap:20px; flex-wrap:wrap; }
+.ft-links a, .ft-links button {
+  font-size:9px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--dim2); text-decoration:none; transition:color .18s;
+  background:none; border:none; cursor:pointer; font-family:inherit;
+  padding:0;
+}
+.ft-links a:hover, .ft-links button:hover { color:var(--text); }
+
+/* ─────────────────────────────────────────
+   TESTIMONIALS
+───────────────────────────────────────── */
+.testimonials-wrap {
+  border-top: 1px solid var(--line);
+  padding: 52px 28px 0;
+}
+.testi-header {
+  display: flex; align-items: baseline; gap: 20px; margin-bottom: 28px;
+}
+.testi-header-label {
+  font-family: var(--serif); font-size: 1rem;
+  font-style: italic; font-weight: 300; color: var(--text);
+}
+.testi-header-line { flex:1; height:1px; background:var(--line); }
+.testi-header-count { font-size: 9px; letter-spacing:.2em; text-transform:uppercase; color:var(--dim2); }
+
+.testimonials {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--line);
+  margin-bottom: 1px;
+}
+.testi {
+  background: var(--bg);
+  padding: 28px 24px 32px;
+  transition: background .2s;
+}
+.testi:hover { background: #111; }
+.testi-name {
+  font-size: 9px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 4px;
+}
+.testi-sub {
+  font-size: 8px; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--dim2); margin-bottom: 18px; opacity: .7;
+}
+.testi-quote {
+  font-family: var(--serif); font-size: .92rem;
+  font-style: italic; font-weight: 300;
+  color: var(--dim); line-height: 1.7; letter-spacing: .01em;
+}
+.testi-quote::before { content: '\2018'; color: var(--dim2); margin-right: 2px; }
+.testi-quote::after  { content: '\2019'; color: var(--dim2); margin-left: 2px; }
+.testi-stars { display: flex; gap: 3px; margin-bottom: 14px; }
+.star { width: 8px; height: 8px; background: var(--text); opacity: .18;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
+.star.lit { opacity: 1; }
+.testi-google {
+  margin-top: 16px;
+  display: flex; align-items: center; gap: 6px;
+}
+.testi-google-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--dim2); opacity:.4;
+}
+.testi-google-label {
+  font-size: 8px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--dim2); opacity: .5;
+}
+
+/* ─────────────────────────────────────────
+   CONTACT MODAL
+───────────────────────────────────────── */
+#contact-modal {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity .28s ease;
+}
+#contact-modal.open { opacity: 1; pointer-events: all; }
+
+.cm-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(6,6,6,.85);
+  backdrop-filter: blur(24px) saturate(.7);
+}
+
+.cm-box {
+  position: relative; z-index: 1;
+  width: min(480px, 92vw);
+  background: #111;
+  border: 1px solid var(--line);
+  padding: 0; overflow: hidden;
+  transform: translateY(18px) scale(.98);
+  transition: transform .32s cubic-bezier(.25,.46,.45,.94);
+}
+#contact-modal.open .cm-box { transform: translateY(0) scale(1); }
+
+.cm-head {
+  padding: 32px 32px 24px;
+  border-bottom: 1px solid var(--line);
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.cm-title {
+  font-family: var(--serif); font-size: 1.5rem;
+  font-style: italic; font-weight: 300; color: var(--text); line-height: 1.1;
+}
+.cm-sub {
+  font-size: 9px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--dim2); margin-top: 8px;
+}
+.cm-close {
+  background: none; border: none; color: var(--dim2);
+  font-size: 18px; line-height: 1; cursor: pointer;
+  padding: 2px 4px; transition: color .16s;
+}
+.cm-close:hover { color: var(--text); }
+
+.cm-options {
+  padding: 20px 24px 28px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+
+.cm-opt {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 20px 20px 22px;
+  border: 1px solid var(--line);
+  text-decoration: none; background: transparent;
+  transition: border-color .2s, background .2s;
+  cursor: pointer;
+}
+.cm-opt:hover {
+  border-color: rgba(238,234,227,.22);
+  background: rgba(255,255,255,.03);
+}
+.cm-opt-label {
+  font-size: 9px; letter-spacing: .22em; text-transform: uppercase; color: var(--dim2);
+}
+.cm-opt-value {
+  font-family: var(--serif); font-size: 1rem;
+  font-style: italic; font-weight: 300; color: var(--text); line-height: 1.2;
+}
+.cm-opt-arrow {
+  margin-top: 10px; font-size: 11px; color: var(--dim2);
+  transition: color .2s, transform .2s;
+}
+.cm-opt:hover .cm-opt-arrow { color: var(--text); transform: translateX(4px); }
+
+/* ─────────────────────────────────────────
+   SCROLL REVEAL
+───────────────────────────────────────── */
+.sr {
+  opacity:0; transform:translateY(22px);
+  transition: opacity .65s cubic-bezier(.25,.46,.45,.94),
+              transform .65s cubic-bezier(.25,.46,.45,.94);
+}
+.sr.d1 { transition-delay:.08s; }
+.sr.d2 { transition-delay:.16s; }
+.sr.d3 { transition-delay:.24s; }
+.sr.d4 { transition-delay:.32s; }
+.sr.vis { opacity:1; transform:none; }
+
+.hero-card.sr { transform:scale(.99) translateY(10px); }
+.hero-card.sr.vis { transform:none; }
+
+.grid.sr-grid .card:nth-child(1) { transition-delay:.04s; }
+.grid.sr-grid .card:nth-child(2) { transition-delay:.10s; }
+.grid.sr-grid .card:nth-child(3) { transition-delay:.16s; }
+.grid.sr-grid .card:nth-child(4) { transition-delay:.22s; }
+.grid.sr-grid .card:nth-child(5) { transition-delay:.28s; }
+.grid.sr-grid .card:nth-child(6) { transition-delay:.34s; }
+.grid.sr-grid .card:nth-child(7) { transition-delay:.40s; }
+.grid.sr-grid .card:nth-child(8) { transition-delay:.46s; }
+
+.hero-card img { will-change: transform; }
+
+nav    { animation: slideDown .55s cubic-bezier(.25,.46,.45,.94) both; }
+.filter-strip { animation: fadeUp .5s .3s cubic-bezier(.25,.46,.45,.94) both; }
+
+@keyframes slideDown {
+  from { transform:translateY(-100%); opacity:0; }
+  to   { transform:none; opacity:1; }
+}
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(16px); }
+  to   { opacity:1; transform:none; }
+}
+
+/* ─────────────────────────────────────────
+   PAGE LOAD ANIMATION
+───────────────────────────────────────── */
+#loader {
+  position: fixed; inset: 0; z-index: 10000;
+  background: #080808;
+  display: flex; flex-direction: column;
+  align-items: flex-start; justify-content: flex-end;
+  padding: 52px 48px;
+  transition: opacity .8s cubic-bezier(.4,0,.2,1);
+}
+#loader.out { opacity: 0; pointer-events: none; }
+
+.loader-word {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(3.5rem, 9vw, 7rem);
+  font-style: italic; font-weight: 300;
+  color: var(--text); line-height: 1;
+  overflow: hidden; display: block;
+}
+.loader-word span {
+  display: block;
+  transform: translateY(110%);
+  animation: loaderWordUp .75s cubic-bezier(.16,1,.3,1) forwards;
+}
+.loader-word:nth-child(2) span { animation-delay: .08s; }
+
+@keyframes loaderWordUp {
+  to { transform: translateY(0); }
+}
+
+.loader-meta {
+  margin-top: 28px;
+  display: flex; align-items: center; gap: 16px;
+}
+.loader-meta-line {
+  width: 0; height: 1px; background: rgba(238,234,227,.25);
+  animation: loaderMetaLine 1s .35s cubic-bezier(.4,0,.2,1) forwards;
+}
+@keyframes loaderMetaLine { to { width: 48px; } }
+.loader-meta-text {
+  font-size: 9px; letter-spacing: .3em; text-transform: uppercase;
+  color: var(--dim2);
+  opacity: 0;
+  animation: loaderFade .6s .5s ease forwards;
+}
+@keyframes loaderFade { to { opacity: 1; } }
+
+/* ─────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────── */
+@media (max-width:900px) {
+  .grid { grid-template-columns:repeat(2,1fr); }
+  .grid.cols-4 { grid-template-columns:repeat(2,1fr); }
+  .page-head { grid-template-columns: 1fr; gap: 24px; }
+  .ph-bio { max-width: 100%; margin-left: 0; }
+  .testimonials { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width:600px) {
+  .page-head { padding:48px 20px 36px; }
+  .about-strip { padding: 0 20px; }
+  .filter-strip { padding: 0 12px; }
+  .fp { padding: 16px 12px; font-size: 9px; letter-spacing: .12em; }
+  .fs-count { display: none; }
+  .grid { grid-template-columns: 1fr 1fr; }
+  .grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .hero-card { height: 58vw; min-height: 200px; }
+  .hero-card-overlay { padding: 20px; }
+  .hc-title { font-size: 1.4rem; }
+  nav { padding: 0 20px; }
+  .nav-logo { display: none; }
+  footer { padding: 24px 20px; flex-direction: column; align-items: flex-start; }
+  .testimonials { grid-template-columns: 1fr; }
+  .testimonials-wrap { padding: 40px 20px 0; }
+  .cm-options { grid-template-columns: 1fr; }
+  .booking-strip { padding: 32px 20px; }
+  .booking-strip-btn { width: 100%; justify-content: center; }
+  .sec-div { padding: 36px 20px 16px; }
+  .hscroll .card { width: clamp(160px, 42vw, 220px); }
+  #loader { padding: 36px 24px; }
+}
+@media (max-width:400px) {
+  .grid { grid-template-columns: 1fr; }
+  .grid.cols-2 { grid-template-columns: 1fr; }
+}
+
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <div>
+    <span class="loader-word"><span>Fotografie</span></span>
+    <span class="loader-word"><span>die bleibt.</span></span>
+  </div>
+  <div class="loader-meta">
+    <div class="loader-meta-line"></div>
+    <span class="loader-meta-text">asymetra · Aaron Schelkes · Viersen</span>
+  </div>
+</div>
+
+<div id="c"></div>
+<div id="cr"></div>
+
+<!-- LIGHTBOX -->
+<div id="lb">
+  <img id="lb-img" src="" alt="">
+  <div id="lb-bar">
+    <button class="lb-btn" id="lb-p">←</button>
+    <span id="lb-count">1 / 1</span>
+    <button class="lb-btn" id="lb-n">→</button>
+    <button class="lb-btn" id="lb-x">Schließen</button>
+  </div>
+</div>
+
+<!-- CONTACT MODAL -->
+<div id="contact-modal">
+  <div class="cm-backdrop" id="cm-backdrop"></div>
+  <div class="cm-box">
+    <div class="cm-head">
+      <div>
+        <div class="cm-title">Kontakt<br>aufnehmen.</div>
+        <div class="cm-sub">Wähle einen Weg</div>
+      </div>
+      <button class="cm-close" id="cm-close">×</button>
+    </div>
+    <div class="cm-options">
+      <a href="mailto:a.schelkes@asymetra.de" class="cm-opt">
+        <span class="cm-opt-label">E-Mail</span>
+        <span class="cm-opt-value">a.schelkes@<br>asymetra.de</span>
+        <span class="cm-opt-arrow">→</span>
+      </a>
+      <a href="https://instagram.com/asymetra.mov" target="_blank" rel="noopener" class="cm-opt">
+        <span class="cm-opt-label">Instagram</span>
+        <span class="cm-opt-value">@asymetra<br>.mov</span>
+        <span class="cm-opt-arrow">→</span>
+      </a>
+      <a href="https://wa.me/4915164094743?text=Hallo%20Aaron%2C%20ich%20m%C3%B6chte%20eine%20Buchungsanfrage%20stellen." class="cm-opt" target="_blank" rel="noopener" style="grid-column:span 2;">
+        <span class="cm-opt-label">WhatsApp · Direktanfrage</span>
+        <span class="cm-opt-value">Jetzt direkt buchen</span>
+        <span class="cm-opt-arrow">→</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="https://asymetra.de" class="nav-back">
+    <span class="nav-back-line"></span>
+    Startseite
+  </a>
+  <a href="https://asymetra.de" class="nav-logo"><img src="https://graphics.asymetra.de/assets/images/image02.png?v=8aba4528" alt="asymetra" style="height:18px;width:auto;opacity:.85;filter:brightness(10);transition:opacity .2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.85"></a>
+  <div class="nav-right">
+    <button class="nav-link cm-trigger">Kontakt</button>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-head">
+  <div class="ph-left">
+    <div class="ph-eyebrow"><img src="https://graphics.asymetra.de/assets/images/image02.png?v=8aba4528" alt="asymetra" style="height:10px;width:auto;filter:brightness(10);opacity:.35;vertical-align:middle;margin-right:8px;">Aaron Schelkes · Fotografie</div>
+    <h1 class="ph-title">Deine Momente<br>verdienen<br>mehr.</h1>
+    <a href="https://wa.me/4915164094743?text=Hallo%20Aaron%2C%20ich%20m%C3%B6chte%20eine%20Buchungsanfrage%20stellen." target="_blank" rel="noopener" class="ph-book-btn">
+      <span class="ph-book-btn-line"></span>
+      Buchungsanfrage via WhatsApp
+      <span class="ph-book-btn-arrow">→</span>
+    </a>
+  </div>
+  <div class="ph-right">
+    <p class="ph-bio">Ich bin Aaron — Fotograf aus Viersen. Hochzeiten, Konzerte, Sport, Editorial. Ich fotografiere nicht für das Archiv, sondern für den Moment, der bleibt. Meine Bilder zeigen, was wirklich passiert ist.</p>
+    <div class="ph-bio-meta">
+      Viersen, NRW &nbsp;·&nbsp; Raum Düsseldorf / Köln / Niederrhein<br>
+      Hochzeit · Events · Sport · Personen · Natur
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT STRIP -->
+<div class="about-strip">
+  <div class="about-strip-item"><strong>Standort</strong> Viersen, NRW</div>
+  <div class="about-strip-item"><strong>Radius</strong> Niederrhein · Düsseldorf · Köln</div>
+  <div class="about-strip-item"><strong>Hochzeit</strong> Documentary · Reportage</div>
+  <div class="about-strip-item"><strong>Events</strong> Konzerte · Feiern · Sport</div>
+  <div class="about-strip-item"><strong>Editorial</strong> Fotoreihen · Reise · Natur</div>
+  <div class="about-strip-item"><strong>Buchung</strong> <a href="https://wa.me/4915164094743?text=Hallo%20Aaron%2C%20ich%20m%C3%B6chte%20eine%20Buchungsanfrage%20stellen." target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">WhatsApp →</a></div>
+</div>
+
+<!-- FILTER STRIP -->
+<div class="filter-strip">
+  <button class="fp on" data-tab="alle">Alle</button>
+  <button class="fp" data-tab="gedenken">Gedenken &amp; Erinnern</button>
+  <button class="fp" data-tab="ibiza">Reiseserie</button>
+  <button class="fp" data-tab="hochzeit">Hochzeit</button>
+  <button class="fp" data-tab="events">Events</button>
+  <button class="fp" data-tab="sport">Sport</button>
+  <button class="fp" data-tab="personen">Personen</button>
+  <button class="fp" data-tab="natur">Natur</button>
+  <span class="fs-count" id="img-count"></span>
+</div>
+
+<main>
+
+<div class="tab on" id="tab-alle">
+
+  <div class="hero-card sr" data-src="https://profile.asymetra.de/assets/images/gallery22/1468d45b_original.jpg">
+    <img src="https://profile.asymetra.de/assets/images/gallery22/1468d45b.jpg" loading="eager" alt="">
+    <div class="hero-card-overlay">
+      <div class="hc-badge">Kuratiert · Auswahl</div>
+      <div class="hc-title">Momente,<br>die bleiben.</div>
+      <div class="hc-meta">asymetra · Viersen</div>
+    </div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Hochzeit</span><span class="sec-div-line"></span><span class="sec-div-count">Niederrhein · Reportage</span></div>
+  <div class="hscroll-wrap sr">
+    <div class="hscroll">
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery22/07ae5537_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery22/07ae5537.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery22/3010e1ec_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery22/3010e1ec.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery22/1468d45b_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery22/1468d45b.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery05/2f6795bc_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery05/2f6795bc.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery05/db235e02_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery05/db235e02.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery05/053f24e9_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery05/053f24e9.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+    </div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Gedenken & Erinnern</span><span class="sec-div-line"></span><span class="sec-div-count">Fotoreihe · SW · Portrait</span></div>
+  <div class="grid sr sr-grid">
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery04/945e65e2_original.jpg" data-cat="Gedenken"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery04/945e65e2.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Gedenken</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery04/aa4c22a8_original.jpg" data-cat="Gedenken"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery04/aa4c22a8.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Gedenken</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery04/21e6392e_original.jpg" data-cat="Gedenken"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery04/21e6392e.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Gedenken</div></div></div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Reiseserie</span><span class="sec-div-line"></span><span class="sec-div-count">Fotoreihe · Licht & Wärme</span></div>
+  <div class="grid sr sr-grid">
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/4711bbe0_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/4711bbe0.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/cf9315f8_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/cf9315f8.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/faa2ab80_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/faa2ab80.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Events</span><span class="sec-div-line"></span><span class="sec-div-count">Konzert · Nacht · Feier</span></div>
+  <div class="grid sr sr-grid">
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery15/7e3e800f_original.jpg" data-cat="Konzert"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery15/7e3e800f.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Konzert</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery16/345636d0_original.jpg" data-cat="Nacht"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery16/345636d0.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Nacht</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery17/7a711b0b_original.jpg" data-cat="Abschlussfeier"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery17/7a711b0b.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Abschlussfeier</div></div></div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Sport</span><span class="sec-div-line"></span><span class="sec-div-count">Leichtathletik · Kampfsport</span></div>
+  <div class="grid sr sr-grid">
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery20/b224f0bf_original.jpg" data-cat="Leichtathletik"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery20/b224f0bf.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Leichtathletik</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery21/d8de6c9e_original.jpg" data-cat="Sport"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery21/d8de6c9e.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Sport</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery19/5d79dac0_original.jpg" data-cat="Kampfsport"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery19/5d79dac0.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Kampfsport</div></div></div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Personen</span><span class="sec-div-line"></span><span class="sec-div-count">Portrait · Editorial</span></div>
+  <div class="hscroll-wrap sr">
+    <div class="hscroll">
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery23/359effda_original.jpg" data-cat="Portrait"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery23/359effda.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Portrait</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery23/44125482_original.jpg" data-cat="Portrait"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery23/44125482.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Portrait</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery23/8053dde7_original.jpg" data-cat="Portrait"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery23/8053dde7.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Portrait</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery23/ac05b6eb_original.jpg" data-cat="Portrait"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery23/ac05b6eb.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Portrait</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery23/b07917b3_original.jpg" data-cat="Portrait"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery23/b07917b3.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Portrait</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery23/82a32dd8_original.jpg" data-cat="Portrait"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery23/82a32dd8.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Portrait</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery23/ef834ead_original.jpg" data-cat="Portrait"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery23/ef834ead.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Portrait</div></div></div>
+    </div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Natur</span><span class="sec-div-line"></span><span class="sec-div-count">Niederrhein · Stille</span></div>
+  <div class="hscroll-wrap sr">
+    <div class="hscroll">
+      <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery27/8c7eaefe_original.jpg" data-cat="Natur"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery27/8c7eaefe.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Natur</div></div></div>
+      <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery24/cd8d28f0_original.jpg" data-cat="Natur"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery24/cd8d28f0.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Natur</div></div></div>
+      <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery25/0ecaa54f_original.jpg" data-cat="Natur"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery25/0ecaa54f.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Natur</div></div></div>
+      <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery26/8f7adb1e_original.jpg" data-cat="Natur"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery26/8f7adb1e.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Natur</div></div></div>
+      <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery01/6618efba_original.jpg" data-cat="Natur"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery01/6618efba.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Natur</div></div></div>
+      <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery03/92c050c2_original.jpg" data-cat="Natur"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery03/92c050c2.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Natur</div></div></div>
+    </div>
+  </div>
+
+</div><!-- /alle -->
+
+
+<div class="tab" id="tab-gedenken">
+
+  <div class="hero-card sr" data-src="https://profile.asymetra.de/assets/images/gallery04/aa4c22a8_original.jpg">
+    <img src="https://profile.asymetra.de/assets/images/gallery04/aa4c22a8.jpg" loading="eager" alt="">
+    <div class="hero-card-overlay">
+      <div class="hc-badge">Fotoreihe · SW</div>
+      <div class="hc-title">Gedenken<br>und Erinnern.</div>
+      <div class="hc-meta">Fotoreihe · asymetra</div>
+    </div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Gedenken und Erinnern</span><span class="sec-div-line"></span><span class="sec-div-count">Fotoreihe · SW · Portrait</span></div>
+  <div class="hscroll-wrap sr">
+    <div class="hscroll">
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery04/a316d307_original.jpg" data-cat="Gedenken"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery04/a316d307.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Gedenken</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery04/2dc01906_original.jpg" data-cat="Gedenken"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery04/2dc01906.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Gedenken</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery04/128150be_original.jpg" data-cat="Gedenken"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery04/128150be.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Gedenken</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery04/14c176bf_original.jpg" data-cat="Gedenken"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery04/14c176bf.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Gedenken</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery04/bbccb925_original.jpg" data-cat="Gedenken"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery04/bbccb925.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Gedenken</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery04/94a30d03_original.jpg" data-cat="Gedenken"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery04/94a30d03.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Gedenken</div></div></div>
+    </div>
+  </div>
+
+  <div class="hscroll-wrap sr">
+    <div class="hscroll">
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery04/20112567_original.jpg" data-cat="Gedenken"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery04/20112567.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Gedenken</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery04/15abb565_original.jpg" data-cat="Gedenken"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery04/15abb565.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Gedenken</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery04/3b719973_original.jpg" data-cat="Gedenken"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery04/3b719973.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Gedenken</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery04/047c5c27_original.jpg" data-cat="Gedenken"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery04/047c5c27.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Gedenken</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery04/21c95276_original.jpg" data-cat="Gedenken"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery04/21c95276.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Gedenken</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery04/63219660_original.jpg" data-cat="Gedenken"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery04/63219660.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Gedenken</div></div></div>
+    </div>
+  </div>
+
+  <div class="hscroll-wrap sr">
+    <div class="hscroll">
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery04/945e65e2_original.jpg" data-cat="Gedenken"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery04/945e65e2.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Gedenken</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery04/aa4c22a8_original.jpg" data-cat="Gedenken"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery04/aa4c22a8.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Gedenken</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery04/6b598358_original.jpg" data-cat="Gedenken"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery04/6b598358.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Gedenken</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery04/bb4c55b2_original.jpg" data-cat="Gedenken"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery04/bb4c55b2.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Gedenken</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery04/21e6392e_original.jpg" data-cat="Gedenken"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery04/21e6392e.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Gedenken</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery04/23fa1c36_original.jpg" data-cat="Gedenken"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery04/23fa1c36.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Gedenken</div></div></div>
+    </div>
+  </div>
+
+</div><!-- /gedenken -->
+
+
+<div class="tab" id="tab-ibiza">
+
+  <div class="hero-card sr" data-src="https://profile.asymetra.de/assets/images/gallery06/769be093_original.jpg">
+    <img src="https://profile.asymetra.de/assets/images/gallery06/769be093.jpg" loading="eager" alt="">
+    <div class="hero-card-overlay">
+      <div class="hc-badge">Fotoreihe · Reise</div>
+      <div class="hc-title">Ibiza —<br>Licht & Wärme.</div>
+      <div class="hc-meta">Reiseserie · asymetra</div>
+    </div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Ibiza</span><span class="sec-div-line"></span><span class="sec-div-count">Reiseserie · Licht &amp; Wärme</span></div>
+  <div class="grid sr sr-grid">
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/769be093_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/769be093.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/35012dc7_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/35012dc7.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/ccb1597d_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/ccb1597d.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/e0004753_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/e0004753.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/9da69141_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/9da69141.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/9763fae6_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/9763fae6.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+  </div>
+
+  <div class="hscroll-wrap sr">
+    <div class="hscroll">
+      <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/4711bbe0_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/4711bbe0.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+      <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/cf9315f8_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/cf9315f8.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+      <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/8e0f988b_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/8e0f988b.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+      <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/e72c09e9_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/e72c09e9.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+      <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/64229a2b_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/64229a2b.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+      <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/f1c34c05_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/f1c34c05.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+      <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/faa2ab80_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/faa2ab80.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+      <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/dba81368_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/dba81368.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+    </div>
+  </div>
+
+  <div class="grid sr sr-grid">
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/b63340ed_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/b63340ed.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/c76f37e6_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/c76f37e6.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/409e4e49_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/409e4e49.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/414e991f_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/414e991f.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/3adb2ee3_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/3adb2ee3.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/1f364bfc_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/1f364bfc.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/1046d1fb_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/1046d1fb.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/2f419b01_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/2f419b01.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/c949ae2d_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/c949ae2d.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/fab940f0_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/fab940f0.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery06/bf3f302e_original.jpg" data-cat="Ibiza"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery06/bf3f302e.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Ibiza</div></div></div>
+  </div>
+
+</div><!-- /ibiza -->
+
+
+<div class="tab" id="tab-hochzeit">
+
+  <div class="hero-card sr" data-src="https://profile.asymetra.de/assets/images/gallery22/1468d45b_original.jpg">
+    <img src="https://profile.asymetra.de/assets/images/gallery22/1468d45b.jpg" loading="eager" alt="">
+    <div class="hero-card-overlay">
+      <div class="hc-badge">Hochzeit · Reportage</div>
+      <div class="hc-title">Der Moment,<br>der bleibt.</div>
+      <div class="hc-meta">Niederrhein · asymetra</div>
+    </div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Hochzeit</span><span class="sec-div-line"></span><span class="sec-div-count">Niederrhein · Reportage</span></div>
+  <div class="hscroll-wrap sr">
+    <div class="hscroll">
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery22/3e3dbbe5_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery22/3e3dbbe5.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>          <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery22/14058c18_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery22/14058c18.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+    </div>
+  </div>
+
+  <div class="grid sr sr-grid">
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery22/07ae5537_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery22/07ae5537.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery22/1468d45b_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery22/1468d45b.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery22/3010e1ec_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery22/3010e1ec.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery22/3d123923_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery22/3d123923.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery22/84fb8d89_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery22/84fb8d89.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery22/58e68469_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery22/58e68469.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery22/83c3c367_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery22/83c3c367.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery22/b6da8292_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery22/b6da8292.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery22/68aaabb9_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery22/68aaabb9.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+  </div>
+
+  <div class="grid sr sr-grid">
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery22/42413308_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery22/42413308.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery22/1edec91e_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery22/1edec91e.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery22/78a08b96_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery22/78a08b96.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery22/7fdeb799_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery22/7fdeb799.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery22/de9797dd_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery22/de9797dd.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery22/ded2e7cc_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery22/ded2e7cc.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery22/91abebf5_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery22/91abebf5.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Hochzeit II</span><span class="sec-div-line"></span><span class="sec-div-count">Niederrhein · Sommer</span></div>
+  <div class="hscroll-wrap sr">
+    <div class="hscroll">
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery05/e55985e0_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery05/e55985e0.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery05/59a73afe_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery05/59a73afe.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery05/765074cf_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery05/765074cf.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery05/2f6795bc_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery05/2f6795bc.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery05/6a9b4ddf_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery05/6a9b4ddf.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery05/f30c21bb_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery05/f30c21bb.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery05/db235e02_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery05/db235e02.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery05/053f24e9_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery05/053f24e9.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery05/ed69c433_original.jpg" data-cat="Hochzeit"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery05/ed69c433.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Hochzeit</div></div></div>
+    </div>
+  </div>
+
+  <div class="more-soon"><span class="more-soon-line"></span><span class="more-soon-text">Weitere Hochzeiten auf Anfrage</span><span class="more-soon-line"></span></div>
+
+</div><!-- /hochzeit -->
+
+
+<div class="tab" id="tab-events">
+
+  <div class="hero-card sr" data-src="https://profile.asymetra.de/assets/images/gallery15/7e3e800f_original.jpg">
+    <img src="https://profile.asymetra.de/assets/images/gallery15/7e3e800f.jpg" loading="eager" alt="">
+    <div class="hero-card-overlay">
+      <div class="hc-badge">Konzerte & Events</div>
+      <div class="hc-title">Musik, Feier,<br>Atmosphäre.</div>
+      <div class="hc-meta">Konzerte &amp; Events · asymetra</div>
+    </div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Konzert</span><span class="sec-div-line"></span><span class="sec-div-count">Bühne &amp; Licht</span></div>
+  <div class="grid sr sr-grid">
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery15/40fb9bda_original.jpg" data-cat="Konzert"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery15/40fb9bda.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Konzert</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery15/7e3e800f_original.jpg" data-cat="Konzert"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery15/7e3e800f.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Konzert</div></div></div>
+    <div class="card wide" data-src="https://profile.asymetra.de/assets/images/gallery15/f0170c67_original.jpg" data-cat="Konzert"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery15/f0170c67.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Konzert</div></div></div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Nacht</span><span class="sec-div-line"></span><span class="sec-div-count">Club · Atmosphäre</span></div>
+  <div class="grid sr sr-grid">
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery16/bbea1797_original.jpg" data-cat="Nacht"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery16/bbea1797.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Nacht</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery16/345636d0_original.jpg" data-cat="Nacht"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery16/345636d0.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Nacht</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery16/bd5ae5bd_original.jpg" data-cat="Nacht"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery16/bd5ae5bd.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Nacht</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery16/1ee506f1_original.jpg" data-cat="Nacht"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery16/1ee506f1.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Nacht</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery16/b7850d8b_original.jpg" data-cat="Nacht"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery16/b7850d8b.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Nacht</div></div></div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Abschlussfeier</span><span class="sec-div-line"></span><span class="sec-div-count">KRH e.V. · Viersen</span></div>
+  <div class="grid sr sr-grid">
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery17/ac3b3bda_original.jpg" data-cat="Abschlussfeier"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery17/ac3b3bda.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Abschlussfeier</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery17/7a711b0b_original.jpg" data-cat="Abschlussfeier"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery17/7a711b0b.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Abschlussfeier</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery17/80c8150e_original.jpg" data-cat="Abschlussfeier"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery17/80c8150e.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Abschlussfeier</div></div></div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Stimmungen</span><span class="sec-div-line"></span><span class="sec-div-count">Randmomente · Event</span></div>
+  <div class="grid sr sr-grid cols-2">
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery18/f55aeefc_original.jpg" data-cat="Event"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery18/f55aeefc.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Event</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery18/31e3c824_original.jpg" data-cat="Event"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery18/31e3c824.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Event</div></div></div>
+  </div>
+
+</div><!-- /events -->
+
+
+<div class="tab" id="tab-sport">
+
+  <div class="hero-card sr" data-src="https://profile.asymetra.de/assets/images/gallery20/4c688cb6_original.jpg">
+    <img src="https://profile.asymetra.de/assets/images/gallery20/4c688cb6.jpg" loading="eager" alt="">
+    <div class="hero-card-overlay">
+      <div class="hc-badge">Sport</div>
+      <div class="hc-title">Schnell,<br>präzise, nah.</div>
+      <div class="hc-meta">Sport · asymetra</div>
+    </div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Leichtathletik</span><span class="sec-div-line"></span><span class="sec-div-count">Wettkampf · Niederrhein</span></div>
+  <div class="grid sr sr-grid">
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery20/4c688cb6_original.jpg" data-cat="Leichtathletik"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery20/4c688cb6.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Leichtathletik</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery20/0747f951_original.jpg" data-cat="Leichtathletik"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery20/0747f951.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Leichtathletik</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery20/b224f0bf_original.jpg" data-cat="Leichtathletik"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery20/b224f0bf.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Leichtathletik</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery20/727cf709_original.jpg" data-cat="Leichtathletik"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery20/727cf709.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Leichtathletik</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery20/c302d645_original.jpg" data-cat="Leichtathletik"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery20/c302d645.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Leichtathletik</div></div></div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Bewegung</span><span class="sec-div-line"></span><span class="sec-div-count">Sport · Dynamik</span></div>
+  <div class="grid sr sr-grid cols-2">
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery21/318dbe14_original.jpg" data-cat="Sport"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery21/318dbe14.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Sport</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery21/d8de6c9e_original.jpg" data-cat="Sport"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery21/d8de6c9e.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Sport</div></div></div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Kampfsport</span><span class="sec-div-line"></span><span class="sec-div-count">Anspannung · Fokus</span></div>
+  <div class="grid sr sr-grid">
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery19/2b65ab67_original.jpg" data-cat="Kampfsport"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery19/2b65ab67.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Kampfsport</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery19/5d79dac0_original.jpg" data-cat="Kampfsport"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery19/5d79dac0.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Kampfsport</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery19/314ff656_original.jpg" data-cat="Kampfsport"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery19/314ff656.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Kampfsport</div></div></div>
+  </div>
+
+</div><!-- /sport -->
+
+
+<div class="tab" id="tab-personen">
+
+  <div class="hero-card sr" data-src="https://profile.asymetra.de/assets/images/gallery23/359effda_original.jpg">
+    <img src="https://profile.asymetra.de/assets/images/gallery23/359effda.jpg" loading="eager" alt="">
+    <div class="hero-card-overlay">
+      <div class="hc-badge">Personen · Portrait</div>
+      <div class="hc-title">Menschen<br>in echten Momenten.</div>
+      <div class="hc-meta">Portrait · asymetra</div>
+    </div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Personen</span><span class="sec-div-line"></span><span class="sec-div-count">Portrait · Editorial</span></div>
+  <div class="hscroll-wrap sr">
+    <div class="hscroll">
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery23/359effda_original.jpg" data-cat="Personen"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery23/359effda.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Personen</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery23/44125482_original.jpg" data-cat="Personen"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery23/44125482.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Personen</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery23/8053dde7_original.jpg" data-cat="Personen"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery23/8053dde7.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Personen</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery23/ac05b6eb_original.jpg" data-cat="Personen"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery23/ac05b6eb.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Personen</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery23/b07917b3_original.jpg" data-cat="Personen"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery23/b07917b3.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Personen</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery23/82a32dd8_original.jpg" data-cat="Personen"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery23/82a32dd8.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Personen</div></div></div>
+      <div class="card portrait" data-src="https://profile.asymetra.de/assets/images/gallery23/ef834ead_original.jpg" data-cat="Personen"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery23/ef834ead.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Personen</div></div></div>
+    </div>
+  </div>
+
+</div><!-- /personen -->
+
+
+<div class="tab" id="tab-natur">
+
+  <div class="hero-card sr" data-src="https://profile.asymetra.de/assets/images/gallery27/f1cc7693_original.jpg">
+    <img src="https://profile.asymetra.de/assets/images/gallery27/f1cc7693.jpg" loading="eager" alt="">
+    <div class="hero-card-overlay">
+      <div class="hc-badge">Natur · Niederrhein</div>
+      <div class="hc-title">Stille vor<br>dem Licht.</div>
+      <div class="hc-meta">Niederrhein · asymetra</div>
+    </div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Morgen</span><span class="sec-div-line"></span><span class="sec-div-count">Nebel · Niederrhein · Diffus</span></div>
+  <div class="grid sr sr-grid">
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery27/f1cc7693_original.jpg" data-cat="Morgen"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery27/f1cc7693.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Morgen</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery27/8c7eaefe_original.jpg" data-cat="Morgen"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery27/8c7eaefe.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Morgen</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery27/33336690_original.jpg" data-cat="Morgen"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery27/33336690.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Morgen</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery27/792e65c5_original.jpg" data-cat="Morgen"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery27/792e65c5.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Morgen</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery27/8cfe2e73_original.jpg" data-cat="Morgen"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery27/8cfe2e73.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Morgen</div></div></div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Wald</span><span class="sec-div-line"></span><span class="sec-div-count">Warmes Licht · Stille</span></div>
+  <div class="grid sr sr-grid">
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery24/0b952100_original.jpg" data-cat="Wald"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery24/0b952100.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Wald</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery24/cd8d28f0_original.jpg" data-cat="Wald"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery24/cd8d28f0.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Wald</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery24/794e00f5_original.jpg" data-cat="Wald"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery24/794e00f5.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Wald</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery24/e2c07fdd_original.jpg" data-cat="Wald"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery24/e2c07fdd.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Wald</div></div></div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Schilf &amp; Wasser</span><span class="sec-div-line"></span><span class="sec-div-count">Niederrhein · Stille</span></div>
+  <div class="grid sr sr-grid">
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery25/a7641b32_original.jpg" data-cat="Schilf"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery25/a7641b32.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Schilf</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery25/570147a5_original.jpg" data-cat="Schilf"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery25/570147a5.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Schilf</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery25/0ecaa54f_original.jpg" data-cat="Schilf"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery25/0ecaa54f.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Schilf</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery25/49fc3418_original.jpg" data-cat="Schilf"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery25/49fc3418.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Schilf</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery25/a459773f_original.jpg" data-cat="Schilf"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery25/a459773f.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Schilf</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery03/69a98426_original.jpg" data-cat="Wasser"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery03/69a98426.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Wasser</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery03/92c050c2_original.jpg" data-cat="Wasser"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery03/92c050c2.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Wasser</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery03/f9ce3c7b_original.jpg" data-cat="Wasser"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery03/f9ce3c7b.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Wasser</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery03/c22e8c15_original.jpg" data-cat="Wasser"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery03/c22e8c15.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Wasser</div></div></div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Landschaft</span><span class="sec-div-line"></span><span class="sec-div-count">Felder · Weite · Niederrhein</span></div>
+  <div class="grid sr sr-grid">
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery26/5c86ec5e_original.jpg" data-cat="Landschaft"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery26/5c86ec5e.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Landschaft</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery26/8f7adb1e_original.jpg" data-cat="Landschaft"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery26/8f7adb1e.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Landschaft</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery26/fade80f2_original.jpg" data-cat="Landschaft"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery26/fade80f2.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Landschaft</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery26/6fe6d0d5_original.jpg" data-cat="Landschaft"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery26/6fe6d0d5.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Landschaft</div></div></div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Pfade</span><span class="sec-div-line"></span><span class="sec-div-count">Wald · Stille</span></div>
+  <div class="grid sr sr-grid">
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery01/156b8a89_original.jpg" data-cat="Wald"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery01/156b8a89.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Wald</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery01/2a04f4f4_original.jpg" data-cat="Wald"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery01/2a04f4f4.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Wald</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery01/6618efba_original.jpg" data-cat="Wald"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery01/6618efba.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Wald</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery01/13462989_original.jpg" data-cat="Wald"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery01/13462989.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Wald</div></div></div>
+  </div>
+
+  <div class="sec-div sr"><span class="sec-div-label">Spiegelung</span><span class="sec-div-line"></span><span class="sec-div-count">Wasser · Ruhe</span></div>
+  <div class="grid sr sr-grid cols-2">
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery02/206319e0_original.jpg" data-cat="Wasser"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery02/206319e0.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Wasser</div></div></div>
+    <div class="card" data-src="https://profile.asymetra.de/assets/images/gallery02/999bb2d0_original.jpg" data-cat="Wasser"><div class="card-img"><img src="https://profile.asymetra.de/assets/images/gallery02/999bb2d0.jpg" loading="lazy" alt=""><button class="card-expand">+</button></div><div class="card-meta"><div class="card-cat">Wasser</div></div></div>
+  </div>
+
+</div><!-- /natur -->
+
+
+</main>
+
+<div class="booking-strip">
+  <div class="booking-strip-inner">
+    <div class="booking-strip-text">
+      <span class="booking-strip-eyebrow">Buchungsanfrage</span>
+      <span class="booking-strip-title">Lass uns zusammenarbeiten.</span>
+    </div>
+    <a href="https://wa.me/4915164094743?text=Hallo%20Aaron%2C%20ich%20m%C3%B6chte%20eine%20Buchungsanfrage%20stellen." target="_blank" rel="noopener" class="booking-strip-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.133.558 4.133 1.535 5.867L.057 23.143a.75.75 0 00.916.932l5.415-1.425A11.935 11.935 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.92 0-3.717-.504-5.272-1.383l-.38-.219-3.934 1.035 1.056-3.842-.238-.394A9.935 9.935 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+      <span>Direkt auf WhatsApp anfragen</span>
+      <span style="margin-left:auto;transition:transform .22s">→</span>
+    </a>
+  </div>
+</div>
+
+<footer>
+  <a href="https://asymetra.de" class="ft-logo"><img src="https://graphics.asymetra.de/assets/images/image02.png?v=8aba4528" alt="asymetra" style="height:16px;width:auto;opacity:.4;filter:brightness(10);"></a>
+  <div class="ft-copy">© 2026 Aaron Schelkes — Fotografie · Viersen</div>
+  <div class="ft-links">
+    <a href="https://instagram.com/asymetra.mov" target="_blank" rel="noopener">Instagram</a>
+    <a href="https://asymetra.de">asymetra.de</a>
+    <a href="https://wa.me/4915164094743?text=Hallo%20Aaron%2C%20ich%20m%C3%B6chte%20eine%20Buchungsanfrage%20stellen." target="_blank" rel="noopener">WhatsApp</a>
+    <button class="cm-trigger">Kontakt</button>
+  </div>
+</footer>
+
+<script>
+
+// ── LOADER ───────────────────────────────────
+const loader = document.getElementById('loader');
+window.addEventListener('load', () => {
+  setTimeout(() => { loader.classList.add('out'); }, 900);
+});
+setTimeout(() => { loader.classList.add('out'); }, 2200);
+
+// ── CURSOR ───────────────────────────────────
+const dot = document.getElementById('c');
+const ring = document.getElementById('cr');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX; my=e.clientY;
+  dot.style.left=mx+'px'; dot.style.top=my+'px';
+});
+(function loop(){
+  rx+=(mx-rx)*.09; ry+=(my-ry)*.09;
+  ring.style.left=rx+'px'; ring.style.top=ry+'px';
+  requestAnimationFrame(loop);
+})();
+document.querySelectorAll('a,button,.card,.hero-card,.hscroll-wrap,.booking-strip-btn').forEach(el=>{
+  el.addEventListener('mouseenter',()=>document.body.classList.add('hover-state'));
+  el.addEventListener('mouseleave',()=>document.body.classList.remove('hover-state'));
+});
+
+// ── HERO PARALLAX ────────────────────────────
+function updateParallax(){
+  document.querySelectorAll('.tab.on .hero-card').forEach(hc=>{
+    const rect = hc.getBoundingClientRect();
+    const center = rect.top + rect.height / 2;
+    const vhCenter = window.innerHeight / 2;
+    const offset = (center - vhCenter) * 0.08;
+    const img = hc.querySelector('img');
+    if(img) img.style.transform = `translateY(${offset}px)`;
+  });
+}
+window.addEventListener('scroll', updateParallax, {passive:true});
+updateParallax();
+
+// ── FILTER TABS ──────────────────────────────
+const fps  = document.querySelectorAll('.fp');
+const tabs = document.querySelectorAll('.tab');
+const cnt  = document.getElementById('img-count');
+
+function countCards(tabId){
+  return document.querySelectorAll('#'+tabId+' .card').length;
+}
+function updateCount(){
+  const on = document.querySelector('.fp.on');
+  const n = countCards('tab-'+on.dataset.tab);
+  cnt.textContent = n + ' Fotos';
+}
+updateCount();
+
+fps.forEach(p=>{
+  p.addEventListener('click',()=>{
+    fps.forEach(x=>x.classList.remove('on'));
+    tabs.forEach(t=>{
+      t.classList.remove('on');
+      t.querySelectorAll('.sr.vis').forEach(el=>{ el.classList.remove('vis'); });
+    });
+    p.classList.add('on');
+    const newTab = document.getElementById('tab-'+p.dataset.tab);
+    newTab.classList.add('on');
+    // Scroll to filter strip smoothly
+    document.querySelector('.filter-strip').scrollIntoView({behavior:'smooth', block:'start'});
+    updateCount();
+    setTimeout(revealImmediate, 80);
+    setTimeout(updateParallax, 120);
+  });
+});
+
+// ── SCROLL REVEAL ────────────────────────────
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('vis');
+      io.unobserve(e.target);
+    }
+  });
+},{threshold:0.04, rootMargin:'0px 0px -30px 0px'});
+
+function revealImmediate(){
+  const onTab = document.querySelector('.tab.on');
+  if(!onTab) return;
+  onTab.querySelectorAll('.sr:not(.vis)').forEach((el,i)=>{
+    const rect = el.getBoundingClientRect();
+    if(rect.top < window.innerHeight * 1.15) {
+      const delay = i * 40;
+      setTimeout(()=>el.classList.add('vis'), delay);
+    } else {
+      io.observe(el);
+    }
+  });
+}
+window.addEventListener('scroll', ()=>{
+  document.querySelectorAll('.tab.on .sr:not(.vis)').forEach(el=>io.observe(el));
+}, {passive:true});
+revealImmediate();
+
+// ── LIGHTBOX ─────────────────────────────────
+const lb    = document.getElementById('lb');
+const lbImg = document.getElementById('lb-img');
+const lbCnt = document.getElementById('lb-count');
+let items=[], idx=0;
+
+function buildList(){
+  const activeTab = document.querySelector('.tab.on');
+  const all = [];
+  activeTab.querySelectorAll('.hero-card[data-src]').forEach(el=>all.push({src:el.dataset.src}));
+  activeTab.querySelectorAll('.card[data-src]').forEach(el=>all.push({src:el.dataset.src}));
+  return all;
+}
+function openLb(src){
+  items = buildList();
+  idx   = items.findIndex(i=>i.src===src);
+  if(idx<0) idx=0;
+  renderLb();
+  lb.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function renderLb(){
+  lbImg.style.opacity=0;
+  lbImg.src=items[idx].src;
+  lbImg.onload=()=>{ lbImg.style.transition='opacity .25s'; lbImg.style.opacity=1; };
+  lbCnt.textContent=(idx+1)+' / '+items.length;
+}
+function closeLb(){
+  lb.classList.remove('open');
+  document.body.style.overflow='';
+}
+document.getElementById('lb-x').onclick=closeLb;
+document.getElementById('lb-p').onclick=()=>{ idx=(idx-1+items.length)%items.length; renderLb(); };
+document.getElementById('lb-n').onclick=()=>{ idx=(idx+1)%items.length; renderLb(); };
+lb.addEventListener('click',e=>{ if(e.target===lb) closeLb(); });
+document.addEventListener('keydown',e=>{
+  if(!lb.classList.contains('open')) return;
+  if(e.key==='Escape') closeLb();
+  if(e.key==='ArrowLeft'){ idx=(idx-1+items.length)%items.length; renderLb(); }
+  if(e.key==='ArrowRight'){ idx=(idx+1)%items.length; renderLb(); }
+});
+let touchStartX=0;
+lb.addEventListener('touchstart',e=>{ touchStartX=e.touches[0].clientX; },{passive:true});
+lb.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-touchStartX;
+  if(Math.abs(dx)>40){
+    if(dx<0){ idx=(idx+1)%items.length; renderLb(); }
+    else    { idx=(idx-1+items.length)%items.length; renderLb(); }
+  }
+});
+document.addEventListener('click',e=>{
+  const card = e.target.closest('.card[data-src]');
+  const hero = e.target.closest('.hero-card[data-src]');
+  const src = card?.dataset.src || hero?.dataset.src;
+  if(src) openLb(src);
+});
+
+// ── CONTACT MODAL ────────────────────────────
+const cm = document.getElementById('contact-modal');
+function openCm(e){ e.preventDefault(); cm.classList.add('open'); document.body.style.overflow='hidden'; }
+function closeCm(){ cm.classList.remove('open'); document.body.style.overflow=''; }
+document.querySelectorAll('.cm-trigger').forEach(el => el.addEventListener('click', openCm));
+document.getElementById('cm-close').addEventListener('click', closeCm);
+document.getElementById('cm-backdrop').addEventListener('click', closeCm);
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && cm.classList.contains('open')) closeCm(); });
+
+</script>
+</body>
+</html>
